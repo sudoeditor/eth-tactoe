@@ -42,4 +42,35 @@ contract FactoryTest is BaseTest {
             factory.create(alice, bob, signature);
         }
     }
+
+    function test_create_CreatesNewChannel() public {
+        address prediction = factory.predict(alice, bob);
+        assertEq(prediction.code.length, 0);
+
+        bytes memory signature = sign(alicePk, factory, Encode.Create(alice, bob));
+
+        vm.prank(bob);
+        factory.create(alice, bob, signature);
+
+        assertGt(prediction.code.length, 0);
+    }
+
+    function test_create_EmitsCreated() public {
+        bytes memory signature = sign(bobPk, factory, Encode.Create(alice, bob));
+
+        vm.expectEmit();
+        emit Factory.Created(alice, bob, Channel(factory.predict(alice, bob)));
+
+        vm.prank(alice);
+        factory.create(alice, bob, signature);
+    }
+
+    function test_create_CallsInitializeOnNewChannel() public {
+        bytes memory signature = sign(alicePk, factory, Encode.Create(alice, bob));
+
+        vm.expectCall(factory.predict(alice, bob), abi.encodeWithSelector(Channel.initialize.selector));
+
+        vm.prank(bob);
+        factory.create(alice, bob, signature);
+    }
 }
