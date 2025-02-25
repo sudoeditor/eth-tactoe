@@ -30,6 +30,16 @@ contract EngineTest is Test {
         assertFalse(gridA.get(1));
     }
 
+    function test_set_RevertsIfIndexIsLowerSeven() public {
+        vm.expectRevert(stdError.indexOOBError);
+
+        EngineTest(address(this)).set(gridA, 15);
+    }
+
+    function test_set_ResultHasNonZeroBitAtIndex() public view {
+        assertTrue(gridB.set(0).get(0));
+    }
+
     function test_equal_ReturnsTrueWhenAllBitsMatchAndFalseOtherwise() public view {
         assertTrue(gridA.equal(gridA));
         assertFalse(gridA.equal(gridC));
@@ -50,6 +60,10 @@ contract EngineTest is Test {
 
     function get(Engine.Grid grid, uint256 index) public pure returns (bool) {
         return grid.get(index);
+    }
+
+    function set(Engine.Grid grid, uint256 index) public pure returns (Engine.Grid) {
+        return grid.set(index);
     }
 
     function unwrap(Engine.Grid grid) internal pure returns (uint16) {
