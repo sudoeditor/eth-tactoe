@@ -55,4 +55,8 @@ library Engine {
     function toGrid(uint16 value) internal pure returns (Grid) {
         return Grid.wrap(value & 0x1ff);
     }
+
+    function newGrid() internal pure returns (Grid) {
+        return Grid.wrap(0);
+    }
 }
