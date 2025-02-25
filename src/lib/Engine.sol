@@ -8,6 +8,10 @@ library Engine {
         return Grid.unwrap(self) == Grid.unwrap(other);
     }
 
+    function union(Grid self, Grid other) internal pure returns (Grid) {
+        return Grid.wrap(Grid.unwrap(self) | Grid.unwrap(other));
+    }
+
     function toGrid(uint16 value) internal pure returns (Grid) {
         return Grid.wrap(value & 0x1ff);
     }
