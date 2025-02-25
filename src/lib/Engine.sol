@@ -36,6 +36,10 @@ library Engine {
         return ((Grid.unwrap(self) >> index) & 1) == 1;
     }
 
+    function set(Grid self, uint256 index) internal pure checkIndex(index) returns (Grid) {
+        return union(self, Grid.wrap(uint16(1 << index)));
+    }
+
     function equal(Grid self, Grid other) internal pure returns (bool) {
         return Grid.unwrap(self) == Grid.unwrap(other);
     }
