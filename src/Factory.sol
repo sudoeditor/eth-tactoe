@@ -31,7 +31,7 @@ contract Factory is EIP712("Factory", "1") {
         Channel channel =
             Channel(Clones.cloneDeterministic(implementation, bytes32(uint256(uint160(alice)) ^ uint256(uint160(bob)))));
         emit Created(alice, bob, channel);
-        channel.initialize();
+        channel.initialize(alice, bob);
     }
 
     function predict(address alice, address bob) external view returns (address) {
