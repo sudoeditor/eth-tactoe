@@ -8,6 +8,14 @@ import {Test} from "forge-std/Test.sol";
 contract EngineTest is Test {
     using Engine for Engine.Grid;
 
+    function test_equal_ReturnsTrueWhenAllBitsMatchAndFalseOtherwise() public pure {
+        Engine.Grid grid_1 = Engine.toGrid(0x155); // 0b0000000101010101
+        Engine.Grid grid_2 = Engine.toGrid(0x155); // 0b0000000101010101
+        Engine.Grid grid_3 = Engine.toGrid(0x1ab); // 0b0000000110101011
+        assertTrue(grid_1.equal(grid_2));
+        assertFalse(grid_1.equal(grid_3));
+    }
+
     function test_intersection_ResultContainsAllNonZeroBitsInBoth() public pure {
         Engine.Grid grid_1 = Engine.toGrid(0x155); // 0b0000000101010101
         Engine.Grid grid_2 = Engine.toGrid(0x1ab); // 0b0000000110101011
