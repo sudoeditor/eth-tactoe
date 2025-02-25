@@ -6,6 +6,14 @@ import {Engine} from "../../src/lib/Engine.sol";
 import {Test} from "forge-std/Test.sol";
 
 contract EngineTest is Test {
+    using Engine for Engine.Grid;
+
+    function test_union_ResultContainsAllNonZeroBitsFromBoth() public pure {
+        Engine.Grid grid_1 = Engine.toGrid(0x155); // 0b0000000101010101
+        Engine.Grid grid_2 = Engine.toGrid(0x0aa); // 0b0000000010101010
+        assertEq(Engine.Grid.unwrap(grid_1.union(grid_2)), 0x1ff); // 0b0000000111111111
+    }
+
     function test_toGrid_ZeroesLowerSevenBits() public pure {
         Engine.Grid grid = Engine.toGrid(0xffff); // 0b1111111111111111
         assertEq(Engine.Grid.unwrap(grid), 0x1ff); // 0b0000000111111111
