@@ -4,6 +4,7 @@ pragma solidity 0.8.28;
 import {Engine} from "../../src/lib/Engine.sol";
 
 import {Test} from "forge-std/Test.sol";
+import {stdError} from "forge-std/StdError.sol";
 
 contract EngineTest is Test {
     using Engine for Engine.Grid;
@@ -16,6 +17,17 @@ contract EngineTest is Test {
         gridA = Engine.toGrid(0x155); // 0b0000000101010101
         gridB = Engine.toGrid(0x0aa); // 0b0000000010101010
         gridC = Engine.toGrid(0x1ab); // 0b0000000110101011
+    }
+
+    function test_get_RevertsIfIndexIsLowerSeven() public {
+        vm.expectRevert(stdError.indexOOBError);
+
+        EngineTest(address(this)).get(gridA, 15);
+    }
+
+    function test_get_ResultIsTrueIfBitIsNonZeroAtIndexOrFalseOtherwise() public view {
+        assertTrue(gridA.get(0));
+        assertFalse(gridA.get(1));
     }
 
     function test_equal_ReturnsTrueWhenAllBitsMatchAndFalseOtherwise() public view {
@@ -34,6 +46,10 @@ contract EngineTest is Test {
     function test_toGrid_ZeroesLowerSevenBits() public pure {
         Engine.Grid grid = Engine.toGrid(0xffff); // 0b1111111111111111
         assertEq(unwrap(grid), 0x1ff); // 0b0000000111111111
+    }
+
+    function get(Engine.Grid grid, uint256 index) public pure returns (bool) {
+        return grid.get(index);
     }
 
     function unwrap(Engine.Grid grid) internal pure returns (uint16) {
