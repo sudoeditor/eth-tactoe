@@ -8,6 +8,12 @@ import {Test} from "forge-std/Test.sol";
 contract EngineTest is Test {
     using Engine for Engine.Grid;
 
+    function test_intersection_ResultContainsAllNonZeroBitsInBoth() public pure {
+        Engine.Grid grid_1 = Engine.toGrid(0x155); // 0b0000000101010101
+        Engine.Grid grid_2 = Engine.toGrid(0x1ab); // 0b0000000110101011
+        assertEq(Engine.Grid.unwrap(grid_1.intersection(grid_2)), 0x101); // 0b0000000100000001
+    }
+
     function test_union_ResultContainsAllNonZeroBitsFromBoth() public pure {
         Engine.Grid grid_1 = Engine.toGrid(0x155); // 0b0000000101010101
         Engine.Grid grid_2 = Engine.toGrid(0x0aa); // 0b0000000010101010
