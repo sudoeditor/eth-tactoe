@@ -21,6 +21,21 @@ contract Channel is EIP712Upgradeable {
 
     event Closed(address indexed winner);
 
+    modifier onlyParticipants() {
+        if (msg.sender != alice && msg.sender != bob) revert InvalidCaller();
+        _;
+    }
+
+    modifier whenClosed() {
+        if (winner == address(0)) revert NotClosed();
+        _;
+    }
+
+    modifier whenNotClosed() {
+        if (winner != address(0)) revert AlreadyClosed();
+        _;
+    }
+
     constructor() {
         _disableInitializers();
     }
@@ -33,18 +48,14 @@ contract Channel is EIP712Upgradeable {
         (alice, bob) = (_alice, _bob);
     }
 
-    function reinitialize() external reinitializer(_getInitializedVersion() + 1) {
-        if (winner == address(0)) revert NotClosed();
-
+    function reinitialize() external whenClosed reinitializer(_getInitializedVersion() + 1) {
         __EIP712_init("Channel", Strings.toString(_getInitializedVersion()));
 
         (alice, bob, winner) = (bob, alice, address(0));
     }
 
     // slither-disable-next-line naming-convention
-    function close(address _winner, bytes calldata signature) external {
-        if (winner != address(0)) revert AlreadyClosed();
-        if (msg.sender != alice && msg.sender != bob) revert InvalidCaller();
+    function close(address _winner, bytes calldata signature) external onlyParticipants whenNotClosed {
         if (_winner != alice && _winner != bob) revert InvalidWinner();
 
         bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(CLOSE_TYPEHASH, _winner)));
