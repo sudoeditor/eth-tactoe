@@ -3,7 +3,7 @@ pragma solidity 0.8.28;
 
 import {Panic} from "@openzeppelin/contracts/utils/Panic.sol";
 
-library Engine {
+library Grids {
     type Grid is uint16;
 
     Grid private constant GRID_1 = Grid.wrap(0x0007); // 0b000000111
