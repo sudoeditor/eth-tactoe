@@ -2,13 +2,14 @@
 pragma solidity 0.8.28;
 
 import {Channel} from "./Channel.sol";
+import {Encode} from "./lib/Encode.sol";
 
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
 contract Factory is EIP712("Factory", "1") {
-    bytes32 private constant CREATE_TYPEHASH = keccak256("Create(address alice,address bob)");
+    using Encode for Encode.Create;
 
     address public immutable implementation;
 
@@ -24,8 +25,7 @@ contract Factory is EIP712("Factory", "1") {
     function create(address alice, address bob, bytes calldata signature) external {
         if (msg.sender != alice && msg.sender != bob) revert InvalidCaller();
 
-        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(CREATE_TYPEHASH, alice, bob)));
-        address signer = ECDSA.recover(digest, signature);
+        address signer = ECDSA.recover(_hashTypedDataV4(Encode.Create(alice, bob).getStructHash()), signature);
         if ((msg.sender == alice) ? signer != bob : signer != alice) revert InvalidSigner();
 
         Channel channel =
