@@ -5,7 +5,7 @@ import {Channel} from "../src/Channel.sol";
 import {Encode} from "../src/lib/Encode.sol";
 import {Factory} from "../src/Factory.sol";
 
-import {BaseTest} from "./BaseTest.sol";
+import {BaseTest} from "./Base.sol";
 
 contract FactoryTest is BaseTest {
     Factory public factory;
