@@ -8,6 +8,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Channel is EIP712Upgradeable {
     bytes32 private constant CLOSE_TYPEHASH = keccak256("Close(address winner)");
+    bytes32 private constant REINITIALIZE_TYPEHASH = keccak256("Reinitialize()");
 
     address public alice;
     address public bob;
@@ -48,7 +49,16 @@ contract Channel is EIP712Upgradeable {
         (alice, bob) = (_alice, _bob);
     }
 
-    function reinitialize() external whenClosed reinitializer(_getInitializedVersion() + 1) {
+    function reinitialize(bytes calldata signature)
+        external
+        onlyParticipants
+        whenClosed
+        reinitializer(_getInitializedVersion() + 1)
+    {
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REINITIALIZE_TYPEHASH)));
+        address signer = ECDSA.recover(digest, signature);
+        if ((msg.sender == alice) ? signer != bob : signer != alice) revert InvalidSigner();
+
         __EIP712_init("Channel", Strings.toString(_getInitializedVersion()));
 
         (alice, bob, winner) = (bob, alice, address(0));
