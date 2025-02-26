@@ -29,4 +29,18 @@ library Encode {
     function toTypedDataHash(IERC5267 app, Create memory data) internal view returns (bytes32) {
         return MessageHashUtils.toTypedDataHash(getDomainSeparator(app), getStructHash(data));
     }
+
+    bytes32 private constant CLOSE_TYPEHASH = keccak256("Close(address winner)");
+
+    struct Close {
+        address winner;
+    }
+
+    function getStructHash(Close memory data) internal pure returns (bytes32) {
+        return keccak256(abi.encode(CLOSE_TYPEHASH, data.winner));
+    }
+
+    function toTypedDataHash(IERC5267 app, Close memory data) internal view returns (bytes32) {
+        return MessageHashUtils.toTypedDataHash(getDomainSeparator(app), getStructHash(data));
+    }
 }
