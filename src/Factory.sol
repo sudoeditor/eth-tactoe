@@ -12,10 +12,10 @@ contract Factory is EIP712("Factory", "1") {
 
     address public immutable implementation;
 
+    event Created(address indexed alice, address indexed bob, Channel channel);
+
     error InvalidCaller();
     error InvalidSigner();
-
-    event Created(address indexed alice, address indexed bob, Channel channel);
 
     constructor() {
         implementation = address(new Channel());

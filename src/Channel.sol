@@ -16,14 +16,14 @@ contract Channel is EIP712Upgradeable {
     address public bob;
     address public winner;
 
+    event Closed(address indexed winner);
+
     error AlreadyClosed();
     error DeadlinePassed();
     error InvalidCaller();
     error InvalidSigner();
     error InvalidWinner();
     error NotClosed();
-
-    event Closed(address indexed winner);
 
     modifier onlyParticipants() {
         if (msg.sender != alice && msg.sender != bob) revert InvalidCaller();
