@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.28;
 
-import {Encode} from "./Encode.sol";
+import {Encode} from "../src/lib/Encode.sol";
 
 import {IERC5267} from "@openzeppelin/contracts/interfaces/IERC5267.sol";
 

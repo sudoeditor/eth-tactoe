@@ -2,10 +2,10 @@
 pragma solidity 0.8.28;
 
 import {Channel} from "../src/Channel.sol";
+import {Encode} from "../src/lib/Encode.sol";
 import {Factory} from "../src/Factory.sol";
 
 import {BaseTest} from "./BaseTest.sol";
-import {Encode} from "./utils/Encode.sol";
 
 contract FactoryTest is BaseTest {
     Factory public factory;

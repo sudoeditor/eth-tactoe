@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.28;
 
-import {BaseUtils} from "./utils/BaseUtils.sol";
+import {BaseUtils} from "./BaseUtils.sol";
 
 import {Test} from "forge-std/Test.sol";
 
