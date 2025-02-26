@@ -43,4 +43,18 @@ library Encode {
     function toTypedDataHash(IERC5267 app, Close memory data) internal view returns (bytes32) {
         return MessageHashUtils.toTypedDataHash(getDomainSeparator(app), getStructHash(data));
     }
+
+    bytes32 private constant REINITIALIZE_TYPEHASH = keccak256("Reinitialize(uint256 deadline)");
+
+    struct Reinitialize {
+        uint256 deadline;
+    }
+
+    function getStructHash(Reinitialize memory data) internal pure returns (bytes32) {
+        return keccak256(abi.encode(REINITIALIZE_TYPEHASH, data.deadline));
+    }
+
+    function toTypedDataHash(IERC5267 app, Reinitialize memory data) internal view returns (bytes32) {
+        return MessageHashUtils.toTypedDataHash(getDomainSeparator(app), getStructHash(data));
+    }
 }
