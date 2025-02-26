@@ -8,13 +8,14 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Channel is EIP712Upgradeable {
     bytes32 private constant CLOSE_TYPEHASH = keccak256("Close(address winner)");
-    bytes32 private constant REINITIALIZE_TYPEHASH = keccak256("Reinitialize()");
+    bytes32 private constant REINITIALIZE_TYPEHASH = keccak256("Reinitialize(uint256 deadline)");
 
     address public alice;
     address public bob;
     address public winner;
 
     error AlreadyClosed();
+    error DeadlinePassed();
     error InvalidCaller();
     error InvalidSigner();
     error InvalidWinner();
@@ -49,13 +50,16 @@ contract Channel is EIP712Upgradeable {
         (alice, bob) = (_alice, _bob);
     }
 
-    function reinitialize(bytes calldata signature)
+    function reinitialize(uint256 deadline, bytes calldata signature)
         external
         onlyParticipants
         whenClosed
         reinitializer(_getInitializedVersion() + 1)
     {
-        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REINITIALIZE_TYPEHASH)));
+        // slither-disable-next-line timestamp
+        if (block.timestamp > deadline) revert DeadlinePassed();
+
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REINITIALIZE_TYPEHASH, deadline)));
         address signer = ECDSA.recover(digest, signature);
         if ((msg.sender == alice) ? signer != bob : signer != alice) revert InvalidSigner();
 
