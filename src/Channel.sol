@@ -28,9 +28,7 @@ contract Channel is EIP712Upgradeable {
         __EIP712_init("Channel", "1");
 
         // slither-disable-next-line missing-zero-check
-        alice = _alice;
-        // slither-disable-next-line missing-zero-check
-        bob = _bob;
+        (alice, bob) = (_alice, _bob);
     }
 
     // slither-disable-next-line naming-convention
