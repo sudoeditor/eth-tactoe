@@ -4,6 +4,7 @@ pragma solidity 0.8.28;
 import {EIP712Upgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
 
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Channel is EIP712Upgradeable {
     bytes32 private constant CLOSE_TYPEHASH = keccak256("Close(address winner)");
@@ -16,6 +17,7 @@ contract Channel is EIP712Upgradeable {
     error InvalidCaller();
     error InvalidSigner();
     error InvalidWinner();
+    error NotClosed();
 
     event Closed(address indexed winner);
 
@@ -29,6 +31,14 @@ contract Channel is EIP712Upgradeable {
 
         // slither-disable-next-line missing-zero-check
         (alice, bob) = (_alice, _bob);
+    }
+
+    function reinitialize() external reinitializer(_getInitializedVersion() + 1) {
+        if (winner == address(0)) revert NotClosed();
+
+        __EIP712_init("Channel", Strings.toString(_getInitializedVersion()));
+
+        (alice, bob, winner) = (bob, alice, address(0));
     }
 
     // slither-disable-next-line naming-convention
