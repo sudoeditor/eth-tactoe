@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.28;
 
+import {Encode} from "./lib/Encode.sol";
+
 import {EIP712Upgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
 
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Channel is EIP712Upgradeable {
-    bytes32 private constant CLOSE_TYPEHASH = keccak256("Close(address winner)");
-    bytes32 private constant REINITIALIZE_TYPEHASH = keccak256("Reinitialize(uint256 deadline)");
+    using Encode for Encode.Close;
+    using Encode for Encode.Reinitialize;
 
     address public alice;
     address public bob;
@@ -58,10 +60,7 @@ contract Channel is EIP712Upgradeable {
     {
         // slither-disable-next-line timestamp
         if (block.timestamp > deadline) revert DeadlinePassed();
-
-        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(REINITIALIZE_TYPEHASH, deadline)));
-        address signer = ECDSA.recover(digest, signature);
-        if ((msg.sender == alice) ? signer != bob : signer != alice) revert InvalidSigner();
+        if (!isValidSigner(Encode.Reinitialize(deadline).getStructHash(), signature)) revert InvalidSigner();
 
         __EIP712_init("Channel", Strings.toString(_getInitializedVersion()));
 
@@ -71,11 +70,14 @@ contract Channel is EIP712Upgradeable {
     // slither-disable-next-line naming-convention
     function close(address _winner, bytes calldata signature) external onlyParticipants whenNotClosed {
         if (_winner != alice && _winner != bob) revert InvalidWinner();
-
-        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(CLOSE_TYPEHASH, _winner)));
-        address signer = ECDSA.recover(digest, signature);
-        if ((msg.sender == alice) ? signer != bob : signer != alice) revert InvalidSigner();
+        if (!isValidSigner(Encode.Close(_winner).getStructHash(), signature)) revert InvalidSigner();
 
         emit Closed(winner = _winner);
+    }
+
+    function isValidSigner(bytes32 structHash, bytes memory signature) internal view returns (bool) {
+        address signer = ECDSA.recover(_hashTypedDataV4(structHash), signature);
+        if ((msg.sender == alice) ? signer == bob : signer == alice) return true;
+        return false;
     }
 }
